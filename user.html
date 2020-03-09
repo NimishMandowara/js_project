@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="./js/build.user.js"></script>
+    <script>
+        window.onload = function() {
+            studObj = new Student();
+            var id = sessionStorage.getItem('sid');
+            loadProfile(studObj.getRecord(id));
+            document.getElementById('logout').addEventListener('click', function() {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }, true);
+
+
+            document.getElementById('update').addEventListener('click', function() {
+                clearData();
+                var student = studObj.getRecord(id);
+                if (student.Address != "-") {
+                    document.getElementById('address').value = student.Address;
+                }
+                var values = student.Certification;
+
+                if (values.length != 0) {
+                    for (var i in values) {
+                        var genCode = certDynamicTextBox(values[i]);
+                        document.getElementById('Certification').innerHTML += genCode;
+                    }
+                }
+                values = student.SpAch;
+                if (values.length != 0) {
+                    for (var i in values) {
+                        var genCode = spDynamicTextBox(values[i]);
+                        document.getElementById('Achievement').innerHTML += genCode;
+                    }
+                }
+            }, true);
+
+            document.getElementById('updateData').addEventListener('click', function() {
+                var addr = document.getElementById('address').value.toLowerCase();
+                var certTag = document.getElementsByName('cert');
+                var achTag = document.getElementsByName('ach');
+                var certificate = [];
+                var achievement = [];
+                for (var i in certTag) {
+                    var value = certTag[i].value;
+                    if (value != undefined) {
+                        certificate.push(value);
+                    }
+                }
+                for (var i in achTag) {
+                    var value = achTag[i].value;
+                    if (value != undefined)
+                        achievement.push(value);
+                }
+
+                studObj.addRecord(id, addr, certificate, achievement);
+            }, true);
+        }
+
+        function clearData() {
+            document.getElementById('Certification').innerHTML = "";
+            document.getElementById('Achievement').innerHTML = "";
+        }
+
+        function loadProfile(students) {
+            document.getElementById('Id').innerHTML += sessionStorage.getItem('sid');
+            document.getElementById('Name').innerHTML += students.Name;
+            document.getElementById('Email').innerHTML += students.Email;
+            document.getElementById('Gender').innerHTML += students.Gender;
+            document.getElementById('Address').innerHTML += students.Address;
+
+            var values = students.Certification;
+            for (var i in values)
+                document.getElementById('certification').innerHTML += "<p style='color: blue;'>" + values[i] + "</p>";
+            values = students.SpAch;
+            for (var i in values)
+                document.getElementById('Spach').innerHTML += "<p style='color: blue;'>" + values[i] + "</p>";
+        }
+    </script>
+    <script>
+        $(function() {
+
+
+            $("#btnAdd").bind("click", function() {
+                var div = $("<div />");
+                div.html(certDynamicTextBox(''));
+                $("#Certification").append(div);
+            });
+
+
+            $("body").on("click", ".remove", function() {
+                $(this).closest("div").remove();
+            });
+
+            $("#speAdd").bind("click", function() {
+                var div = $("<div />");
+                div.html(spDynamicTextBox(''));
+                $("#Achievement").append(div);
+            });
+
+
+            $("body").on("click", ".remove", function() {
+                $(this).closest("div").remove();
+            });
+        });
+
+        function spDynamicTextBox(value) {
+            return '<div class="input-group" style="margin-bottom: 5px;"><input type="text" name = "ach"  class="form-control" value="' + value + '"  />' +
+                '<span class="input-group-btn"><input type="button" value="Remove" id="remove" class="remove btn btn-primary"  /></span></div>'
+        }
+
+        function certDynamicTextBox(value) {
+            return '<div class="input-group" style="margin-bottom: 5px;"><input type="text" name = "cert" class="form-control" value="' + value + '"  />' +
+                '<span class="input-group-btn"><input type="button" value="Remove" id="remove" class="remove btn btn-primary" /></span></div>'
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+              <span class="icon-bar">Logout</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>                        
+            </button>
+                <a class="navbar-brand" href="#">User</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar" style="font-weight: bold;">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a onclick="window.location.href ='index.html';">Home</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><button id="logout" class="btn btn-info" onclick="window.location.href ='login.html';"><span class="glyphicon glyphicon-log-in" ></span> Logout</button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container" id="Container">
+        <div class="form-group row">
+            <div class="col-lg-2">
+                <input type="button" id="update" value="Update" class="btn btn-primary" data-toggle="modal" data-target="#editstud" />
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="editstud" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" id="close">&times;</button>
+                    <h4 class="modal-title">Update Record</h4>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <input type="text" id="address" class="form-control form-control-lg" placeholder="Address"><br>
+                        <div id="Certification">
+
+                        </div>
+                        <input id="btnAdd" type="button" value="Add Certification" style="margin-top: 10px; margin-bottom: 10px;;" class="btn btn-primary" />
+                        <div id="Achievement">
+                        </div>
+                        <input id="speAdd" type="button" value="Add Special Achievement" style="margin-top: 10px;" class="btn btn-primary" />
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" id="updateData" class="btn btn-success" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="container jumbotron" style="background-color: rgb(209, 237, 250);">
+        <div>
+            <div>
+                <h2>Profile</h2>
+                </p>
+                <p id="Id">Id: </p>
+                <p id="Name">Name: </p>
+                <p id="Email">Email: </p>
+                <p id="Gender">Gender: </p>
+                <p id="Address">Address: </p>
+                <div id="certification">
+                    <h3>Certification: </h3>
+                </div>
+                <div id="Spach">
+                    <h3>Special Achievements: </h3>
+                </div>
+            </div>
+        </div>
+</body>
+
+</html>

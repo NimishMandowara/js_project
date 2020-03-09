@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>My Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" type="text/css" href="css/login.css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="./js/build.user.js"></script>
+    <script src="./js/build.admin.js"></script>
+    <script>
+        window.onload = function() {
+            document.getElementById('submit').addEventListener('click', function() {
+                var id = document.getElementById('sid').value;
+                var pwd = document.getElementById('password').value;
+                studObj = new Student();
+                var data = studObj.getRecord(id);
+                if (data != undefined) {
+                    if (data.Password == pwd) {
+                        sessionStorage.setItem('sid', id);
+                        window.location.href = 'user.html';
+                    } else {
+                        alert('Wrong Password');
+                    }
+                }
+            }, true);
+
+            document.getElementById('submit').addEventListener('click', function() {
+                var id = document.getElementById('sid').value;
+                var pwd = document.getElementById('password').value;
+                var adminObj = new Admin();
+                var data1 = adminObj.getCredentials();
+
+                if (data1.get('id') == id) {
+                    if (data1.get('pwd') == pwd) {
+                        window.location.href = 'adminDashboard.html';
+                    } else {
+                        alert('Wrong Password');
+                    }
+                }
+            }, true);
+        };
+    </script>
+</head>
+
+<body class="my-login-page">
+    <section class="h-5000">
+        <div class="container-lg">
+            <div class="row justify-content-md-center h-5000">
+                <div class="card-wrapper">
+                    <div class="card fat">
+                        <div class="card-body">
+                            <h4 class="card-title">Login</h4>
+                            <form method="POST" class="my-login-validation" novalidate="">
+                                <div class="form-group">
+                                    <i class="fa fa-user"></i>
+                                    <input type="text" id="sid" class="form-control" placeholder="Username" required="required">
+                                </div>
+                                <div class="form-group">
+                                    <i class="fa fa-lock"></i>
+                                    <input type="password" id="password" class="form-control" placeholder="Password" required="required">
+                                </div>
+                                <div class="form-group">
+                                    <input type="button" id="submit" class="btn btn-primary btn-block btn-lg" value="Login">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</body>
+
+</html>

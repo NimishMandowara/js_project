@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        .active-cyan-4 input[type=text]:focus:not([readonly]) {
+            border: 1px solid #4dd0e1;
+            box-shadow: 0 0 0 1px #4dd0e1;
+        }
+        
+        .active-cyan-3 input[type=text] {
+            border: 1px solid #4dd0e1;
+            box-shadow: 0 0 0 1px #4dd0e1;
+        }
+    </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="./js/build.admin.js"></script>
+    <script>
+        window.onload = function() {
+            adminobj = new Admin();
+            var students = adminobj.getStudent();
+            loadTable(students);
+
+            document.getElementById('search').addEventListener('keyup', function() {
+                var data = "";
+                if (this.value == "") {
+                    data = adminobj.getStudent();
+                    loadTable(data);
+                } else {
+                    if (document.getElementById('certOption').checked) {
+                        data = adminobj.search(this.value);
+                    } else {
+                        data = adminobj.search(this.value, "spach");
+                    }
+
+                    loadTable(data);
+                }
+            }, true);
+
+            document.getElementById('addstud').addEventListener('click', function() {
+                var student = {
+                    Name: document.getElementById('name').value,
+                    Email: document.getElementById('email').value,
+                    Password: document.getElementById('password').value,
+                    Gender: document.getElementById('lstgender').value,
+                    Address: "-",
+                    Certification: [],
+                    SpAch: []
+                };
+
+
+
+                var check = adminobj.addStudent(student);
+                if (!check)
+                    alert('Put Unique Email ID');
+                var data = adminobj.getStudent();
+                loadTable(data);
+
+            }, true);
+        }
+
+        function loadTable(students) {
+            if (students.size == 0)
+                return;
+            document.getElementById('records').style.display = "block";
+            document.getElementById('thead').innerHTML = "<th>Id</th><th>Name</th><th>Email</th><th>Password</th><th>Address</th><th>Gender</th><th>Certification</th><th>Special Achievement</th><th></th>";
+            tr = "";
+            students.forEach((v, i) => {
+                tr += "<tr><td>" + i + "</td><td>" + v.Name + "</td><td>" + v.Email + "</td><td>" + v.Password + "</td><td>" + v.Address + "</td>" + "<td>" + v.Gender + "</td>";
+                if (v.Certification.length > 0) {
+                    var values = v.Certification;
+                    tr += "<td>";
+                    for (var j in values)
+                        tr += values[j] + "<br>";
+                    tr += "</td>"
+                } else {
+                    tr += "<td>-</td>";
+                }
+                if (v.SpAch.length > 0) {
+                    var values = v.SpAch;
+                    tr += "<td>";
+                    for (var j in values)
+                        tr += values[j] + "<br>";
+                    tr += "</td>"
+                } else {
+                    tr += "<td>-</td>";
+                }
+
+                tr += `<td><button onclick="deleteSt('${i}')" class="btn btn-primary">Delete</button></td></tr>`;
+            });
+            document.getElementById('tbody').innerHTML = tr;
+        }
+
+        function deleteSt(id) {
+            var students = adminobj.deleteStudent(id);
+            loadTable(students);
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class=" navbar-header ">
+                <button type="button " class="navbar-toggle " data-toggle="collapse " data-target="#myNavbar ">
+                  <span class="icon-bar " >Logout</span>
+                  <span class="icon-bar "></span>
+                  <span class="icon-bar "></span>                        
+                </button>
+                <a class="navbar-brand " href="# ">Admin</a>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a onClick="window.location.href= 'index.html'">Home</a></li>
+                </ul>
+            </div>
+            <div class="collapse navbar-collapse " id="myNavbar " style="font-weight: bold; ">
+
+                <ul class="nav navbar-nav navbar-right ">
+                    <li><button id="logout " class="btn btn-info" onclick="window.location.href='login.html'"><span class="glyphicon glyphicon-log-in "></span>Logout</button></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="text-center">
+        <button type="button" class=" btn btn-primary" data-toggle="modal" data-target="#myModal">Add Student</button>
+    </div>
+    <div id="myModal" class="modal fade">
+        <div class="modal-dialog modal-login">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" style="padding:0.75px" ;>Add Student</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="col-md-9 form_field">
+
+                            <form id="survey-form">
+
+                                <div class="form-group">
+                                    <label id="name-label" for="name">Name</label>
+                                    <input type="name" name="name" class="form-control" style="width: 60%" id="name" aria-describedby="emailHelp" placeholder="Enter your name" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label id="email-label" for="email">Email address</label>
+                                    <input type="email" name="email" class="form-control" style="width: 60%" id="email" placeholder="Enter you email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label id="email-label" for="email">Password</label>
+                                    <input type="password" name="password" class="form-control" style="width: 60%" id="password" placeholder="Enter your password" required>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <p>Gender</p>
+                                    <select id="lstgender" class="form-control" style="width: 15%" placeholder="Select" required="*">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="others">Others</option>
+                                        </select>
+                                </div>
+                                <div class="form-group">
+                                    <input class="submit" type="button" value="Save" id="addstud" data-dismiss="modal">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="records" style="margin-top: 30px; display: none;">
+        <div class="custom-control custom-radio">
+
+        </div>
+        <div>
+            <form class="form-inline active-cyan-3 active-cyan-4">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="text" id="search" class="form-control form-control-md" style="float: right;" placeholder="Search">
+                <label class="custom-control-label"><input type="radio" class="custom-control-input" name="selectOption"  id="certOption"  checked> Certification  </label>
+                <label class="custom-control-label"><input type="radio" class="custom-control-input" name="selectOption" id="spachOption" > Achievement  </label>
+            </form>
+        </div>
+        <table class="table table-bordered text-center" style="margin-top: 50px;">
+            <thead id="thead">
+
+            </thead>
+            <tbody id="tbody">
+                <tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>
